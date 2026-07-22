@@ -20,9 +20,9 @@ export default function Workspace({ files = [] }: WorkspaceProps) {
   const [slicerLine, setSlicerLine] = useState(500);
   const [blocks, setBlocks] = useState<CsvFile[]>(files);
 
-  // Calculate proportional height (1 row = 0.5px, min 60px)
+  // Calculate proportional height (1 row = 0.2px, min 40px)
   const calculateHeight = (rowCount: number) => {
-    return Math.max(60, rowCount * 0.5);
+    return Math.max(40, rowCount * 0.2);
   };
 
   const handleDragStart = (fileId: string) => {
@@ -36,8 +36,8 @@ export default function Workspace({ files = [] }: WorkspaceProps) {
   return (
     <div className="h-full bg-gradient-to-b from-background to-card flex flex-col">
       {/* Canvas area */}
-      <div className="flex-1 overflow-auto p-6 md:p-8">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <div className="flex-1 overflow-auto p-4 md:p-6">
+        <div className="max-w-4xl mx-auto space-y-4">
           {blocks.length === 0 ? (
             <div className="flex items-center justify-center h-96 border-2 border-dashed border-border rounded-xl">
               <div className="text-center">

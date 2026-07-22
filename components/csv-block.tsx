@@ -34,15 +34,15 @@ export default function CsvBlock({
       style={{
         backgroundColor: color,
         height: `${height}px`,
-        minHeight: '60px',
+        minHeight: '40px',
       }}
     >
       {/* Content overlay */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white pointer-events-none rounded-lg">
-        <p className="text-sm md:text-base font-semibold text-center px-3">
+        <p className="text-xs md:text-sm font-semibold text-center px-2">
           {name}
         </p>
-        <p className="text-xs md:text-sm opacity-90 mt-1">
+        <p className="text-xs opacity-90 mt-0.5">
           {rowCount.toLocaleString()} rows
         </p>
       </div>

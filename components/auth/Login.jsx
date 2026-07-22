@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
 export default function Login({ onClose, onSwitchToSignUp }) {
+  const router = useRouter();
   const { signInWithEmailAndPassword, signInWithGoogle, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +23,7 @@ export default function Login({ onClose, onSwitchToSignUp }) {
     try {
       await signInWithEmailAndPassword(email, password);
       onClose?.();
+      router.push('/editor');
     } catch (err) {
       setLocalError(err.message);
     } finally {
@@ -35,6 +38,7 @@ export default function Login({ onClose, onSwitchToSignUp }) {
     try {
       await signInWithGoogle();
       onClose?.();
+      router.push('/editor');
     } catch (err) {
       setLocalError(err.message);
     } finally {

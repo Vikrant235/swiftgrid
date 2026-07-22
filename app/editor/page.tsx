@@ -5,6 +5,7 @@ import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
 import Toolbar from '@/components/toolbar';
 import Workspace from '@/components/workspace';
+import CsvUploader from '@/components/CsvUploader';
 
 interface FileItem {
   id: string;
@@ -29,10 +30,22 @@ export default function EditorPage() {
       color: '#ec4899',
     },
   ]);
+  const [showUploader, setShowUploader] = useState(false);
 
   const handleImport = () => {
-    // In a real app, this would open a file dialog
-    console.log('[v0] Import file clicked');
+    setShowUploader(true);
+  };
+
+  const handleFileProcessed = (fileData: { file: File; metadata: any }) => {
+    // Add the processed file to the workspace
+    const newFile: FileItem = {
+      id: `file_${Date.now()}`,
+      name: fileData.file.name.replace('.csv', ''),
+      rowCount: fileData.metadata.totalRows,
+      color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+    };
+    setFiles([...files, newFile]);
+    setShowUploader(false);
   };
 
   const handleRemoveFile = (fileId: string) => {
@@ -78,8 +91,22 @@ export default function EditorPage() {
             onStripEmpty={handleStripEmpty}
           />
 
-          {/* Workspace */}
-          <Workspace files={files} />
+          {/* Uploader Modal / Workspace */}
+          {showUploader ? (
+            <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
+              <div className="w-full max-w-2xl">
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold text-foreground mb-2">Upload CSV File</h2>
+                  <p className="text-muted-foreground">
+                    Upload a new CSV file to add to your workspace. Files are processed locally with streaming chunks.
+                  </p>
+                </div>
+                <CsvUploader onFileProcessed={handleFileProcessed} />
+              </div>
+            </div>
+          ) : (
+            <Workspace files={files} />
+          )}
         </div>
       </div>
     </>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CsvBlock from './csv-block';
 import SlicerTool from './slicer-tool';
 
@@ -19,10 +19,40 @@ export default function Workspace({ files = [] }: WorkspaceProps) {
   const [draggedFile, setDraggedFile] = useState<string | null>(null);
   const [slicerLine, setSlicerLine] = useState(500);
   const [blocks, setBlocks] = useState<CsvFile[]>(files);
+  const [, setRerenderKey] = useState(0);
 
-  // Calculate proportional height (1 row = 0.5px, min 60px)
+  // Recalculate heights on window resize and when blocks change
+  useEffect(() => {
+    setBlocks(files);
+  }, [files]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setRerenderKey(prev => prev + 1);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Calculate proportional height based on largest file
   const calculateHeight = (rowCount: number) => {
-    return Math.max(60, rowCount * 0.5);
+    if (blocks.length === 0) return 40;
+    
+    // Find the largest file by row count
+    const largestRowCount = Math.max(...blocks.map(f => f.rowCount));
+    
+    // Calculate height: largest file gets 20% of screen height
+    // Other files scale proportionally
+    const screenHeightPercent = 20; // 20% of screen
+    const baseHeightPixels = typeof window !== 'undefined' 
+      ? (window.innerHeight * screenHeightPercent) / 100 
+      : 300; // Fallback for SSR
+    
+    // Proportional height based on row count ratio
+    const proportionalHeight = (rowCount / largestRowCount) * baseHeightPixels;
+    
+    return Math.max(40, proportionalHeight);
   };
 
   const handleDragStart = (fileId: string) => {
@@ -36,8 +66,8 @@ export default function Workspace({ files = [] }: WorkspaceProps) {
   return (
     <div className="h-full bg-gradient-to-b from-background to-card flex flex-col">
       {/* Canvas area */}
-      <div className="flex-1 overflow-auto p-6 md:p-8">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <div className="flex-1 overflow-auto p-4 md:p-6">
+        <div className="max-w-4xl mx-auto space-y-4">
           {blocks.length === 0 ? (
             <div className="flex items-center justify-center h-96 border-2 border-dashed border-border rounded-xl">
               <div className="text-center">
@@ -47,7 +77,7 @@ export default function Workspace({ files = [] }: WorkspaceProps) {
             </div>
           ) : (
             blocks.map((file) => (
-              <div key={file.id} className="space-y-3">
+              <div key={`${file.id}-${blocks.length}`} className="space-y-3">
                 <CsvBlock
                   id={file.id}
                   name={file.name}

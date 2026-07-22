@@ -34,7 +34,7 @@ export default function CsvBlock({
       style={{
         backgroundColor: color,
         height: `${height}px`,
-        minHeight: '2px',
+        minHeight: '40px',
       }}
     >
       {/* Content overlay */}
